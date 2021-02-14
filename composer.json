@@ -1,10 +1,10 @@
 {
-    "name": "laravel/laravel",
+    "name": "ami/ami",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Advanced Metering Infrastructure",
     "keywords": [
-        "framework",
-        "laravel"
+        "ami",
+        "irea"
     ],
     "license": "MIT",
     "require": {
