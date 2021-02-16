@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Precipitation extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['station', 'ts', 'uom', 'observed'];
+    public $timestamps = false;
 }
