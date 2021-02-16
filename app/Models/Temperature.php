@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Temperature extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['station', 'ts', 'uom', 'observed'];
+    public $timestamps = false;
 }

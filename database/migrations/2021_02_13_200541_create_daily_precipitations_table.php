@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePrecipitationsTable extends Migration
+class CreateDailyPrecipitationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePrecipitationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('precipitations', function (Blueprint $table) {
+        Schema::create('daily_precipitations', function (Blueprint $table) {
             $table->id();
             $table->string('station', 25);
             $table->timestamp('ts');
@@ -30,6 +30,6 @@ class CreatePrecipitationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('precipitations');
+        Schema::dropIfExists('daily_precipitations');
     }
 }
