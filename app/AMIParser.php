@@ -97,26 +97,14 @@ class AMIParser
     }
 
     /**
-     * @param UploadedFile|null $uploadedFile
+     * Parse AMI data from file content
+     *
+     * @param string $fileContent
      * @return array
      */
-    public function parseFile(UploadedFile|null $uploadedFile): array
+    public function parseFile(string $fileContent): array
     {
-        if (is_null($uploadedFile)) {
-            abort(400, 'No file was uploaded.');
-        }
-        if (!$uploadedFile?->isValid()) {
-            abort(400, $uploadedFile->getErrorMessage());
-        }
-        if ($uploadedFile->getMimeType() != 'application/json') {
-            abort(400, "Invalid file type was uploaded.");
-        }
-
-        try {
-            $amiData = json_decode($uploadedFile->get());
-        } catch (FileNotFoundException $e) {
-            abort(500, $e->getMessage());
-        }
+        $amiData = json_decode($fileContent);
 
         $inputParameters = [];
         foreach ($amiData->inputParameters as $inputParameter) {
