@@ -55,8 +55,8 @@ class ImportAMI extends Command
             return -1;
         }
 
-        $result = $parser->parseFile($fileContent);
-        $summary  = "Type: $result[type]\n";
+        $result = $parser->parseFile($fileContent, $this->output->createProgressBar());
+        $summary  = "\nType: $result[type]\n";
         $summary .= "Records Parsed: $result[parsed]\n";
         $summary .= "Records Saved: $result[saved]";
         if ($result['type'] == 'Meter Usage') {

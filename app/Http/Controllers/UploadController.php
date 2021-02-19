@@ -45,7 +45,7 @@ class UploadController extends Controller
             abort(500, $e->getMessage());
         }
 
-        $result = $parser->parseFile($fileContent);
+        $result = $parser->parseFile($fileContent, null);
         return view('upload.result', $result);
     }
 }

@@ -10,27 +10,38 @@ use App\Models\Temperature;
 use App\Models\WindSpeed;
 use Carbon\Carbon;
 use JetBrains\PhpStorm\ArrayShape;
+use StdClass;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class AMIParser
 {
+    private StdClass $amiData;
+    private array $inputParameters;
+    private ?ProgressBar $bar;
+
     #[ArrayShape(['type' => "string", 'parsed' => "int", 'saved' => "int", 'discrepancies' => "array"])]
-    private function parseMeterUsage($amiData, $inputParameters): array
+    private function parseMeterUsage(): array
     {
-        $meterId = $amiData->meterId;
-        $meterUOM = $amiData->uom;
-        $meterTotals = $amiData->meterUsageDataList[0]->members[0];
+        $meterId = $this->amiData->meterId;
+        $meterUOM = $this->amiData->uom;
+        $meterTotals = $this->amiData->meterUsageDataList[0]->members[0];
         $meterTotal = $meterTotals->total;
         $subTotals = [];
         foreach ($meterTotals->subTotals as $subTotal) {
             $subTotals[$subTotal->detail->datasetTitle] = $subTotal->value;
         }
 
-        $totalParsed = $totalSaved = 0;
-        foreach ($amiData->resultsInfo as $i => $resultInfo) {
+        $totalParsed = $totalSaved = $expectedTotal = 0;
+        foreach ($this->amiData->resultsInfo as $i => $resultInfo) {
+            $expectedTotal += count($this->amiData->resultsTiered[0][$i]);
+        }
+        $this->bar?->start($expectedTotal);
+
+        foreach ($this->amiData->resultsInfo as $i => $resultInfo) {
             $peak = ($resultInfo->datasetTitle == "On-peak");
-            foreach ($amiData->resultsTiered[0][$i] as $result) {
+            foreach ($this->amiData->resultsTiered[0][$i] as $result) {
                 if ($result[1] != 0.0) {
-                    if ($inputParameters['DatasetType'] != 'Weather') {
+                    if ($this->inputParameters['DatasetType'] != 'Weather') {
                         $meterUsage = new MeterUsage([
                             'meter' => $meterId,
                             //'ts'    => $result[0],
@@ -46,9 +57,11 @@ class AMIParser
                     $meterTotal -= $result[1];
                     $subTotals[($resultInfo->datasetTitle)] -= $result[1];
                 }
+                $this->bar?->advance();
                 $totalParsed++;
             }
         }
+        $this->bar?->finish();
 
         return [
             'type'          => 'Meter Usage',
@@ -63,9 +76,9 @@ class AMIParser
     }
 
     #[ArrayShape(['type' => "mixed", 'parsed' => "int", 'saved' => "int"])]
-    private function parseWeatherData($amiData, $inputParameters): array
+    private function parseWeatherData(): array
     {
-        $weatherType = match ($inputParameters['WeatherDataType']) {
+        $weatherType = match ($this->inputParameters['WeatherDataType']) {
             "Daily Precipitation" => DailyPrecipitation::class,
             "Relative Humidity"   => RelativeHumidity::class,
             "Temperature"         => Temperature::class,
@@ -75,20 +88,23 @@ class AMIParser
 
         $totalSaved = 0;
         if ($weatherType) {
-            foreach ($amiData->resultsWeather as $result) {
+            $this->bar?->start(count($this->amiData->resultsWeather));
+            foreach ($this->amiData->resultsWeather as $result) {
                 $weather = new $weatherType([
-                    'station'  => $inputParameters['WeatherStation'],
+                    'station'  => $this->inputParameters['WeatherStation'],
                     'ts'       => $result[0],
-                    'uom'      => $inputParameters['WeatherDataUOM'],
+                    'uom'      => $this->inputParameters['WeatherDataUOM'],
                     'observed' => $result[1]
                 ]);
                 $weather->save();
+                $this->bar?->advance();
                 $totalSaved++;
             }
+            $this->bar?->finish();
         }
 
         return [
-            'type'   => $inputParameters['WeatherDataType'],
+            'type'   => $this->inputParameters['WeatherDataType'],
             'parsed' => $totalSaved,
             'saved'  => $totalSaved
         ];
@@ -98,21 +114,24 @@ class AMIParser
      * Parse AMI data from file content
      *
      * @param string $fileContent
+     * @param ProgressBar|null $output
      * @return array
      */
-    public function parseFile(string $fileContent): array
+    public function parseFile(string $fileContent, ?ProgressBar $output): array
     {
-        $amiData = json_decode($fileContent);
+        $this->amiData = json_decode($fileContent);
 
-        $inputParameters = [];
-        foreach ($amiData->inputParameters as $inputParameter) {
-            $inputParameters[$inputParameter->paramId] = $inputParameter->value;
+        $this->inputParameters = [];
+        foreach ($this->amiData->inputParameters as $inputParameter) {
+            $this->inputParameters[$inputParameter->paramId] = $inputParameter->value;
         }
 
-        if ($inputParameters['DatasetType'] == 'Weather') {
-            return ($this->parseWeatherData($amiData, $inputParameters));
+        $this->bar = $output;
+
+        if ($this->inputParameters['DatasetType'] == 'Weather') {
+            return ($this->parseWeatherData());
         } else {
-            return ($this->parseMeterUsage($amiData, $inputParameters));
+            return ($this->parseMeterUsage());
         }
     }
 }
