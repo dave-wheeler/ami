@@ -9,8 +9,6 @@ use App\Models\RelativeHumidity;
 use App\Models\Temperature;
 use App\Models\WindSpeed;
 use Carbon\Carbon;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Http\UploadedFile;
 use JetBrains\PhpStorm\ArrayShape;
 
 class AMIParser
