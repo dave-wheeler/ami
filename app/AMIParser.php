@@ -4,11 +4,11 @@
 namespace App;
 
 use App\Models\DailyPrecipitation;
-use App\Models\MeterUsage;
 use App\Models\RelativeHumidity;
 use App\Models\Temperature;
 use App\Models\WindSpeed;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;
 use StdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -37,12 +37,13 @@ class AMIParser
         }
         $this->bar?->start($expectedTotal);
 
+        $meterUsages = [];
         foreach ($this->amiData->resultsInfo as $i => $resultInfo) {
             $peak = ($resultInfo->datasetTitle == "On-peak");
             foreach ($this->amiData->resultsTiered[0][$i] as $result) {
                 if ($result[1] != 0.0) {
                     if ($this->inputParameters['DatasetType'] != 'Weather') {
-                        $meterUsage = new MeterUsage([
+                        $meterUsages[] = [
                             'meter' => $meterId,
                             //'ts'    => $result[0],
                             'ts'    => Carbon::createFromFormat('Y-m-d H:i', $result[0],
@@ -50,8 +51,7 @@ class AMIParser
                             'uom'   => $meterUOM,
                             'usage' => $result[1],
                             'peak'  => $peak
-                        ]);
-                        $meterUsage->save();
+                        ];
                         $totalSaved++;
                     }
                     $meterTotal -= $result[1];
@@ -60,6 +60,10 @@ class AMIParser
                 $this->bar?->advance();
                 $totalParsed++;
             }
+        }
+
+        foreach (collect($meterUsages)->chunk(1000) as $chunk) {
+            DB::table('meter_usages')->insert($chunk->toArray());
         }
         $this->bar?->finish();
 
@@ -88,17 +92,24 @@ class AMIParser
 
         $totalSaved = 0;
         if ($weatherType) {
+            $weather = new $weatherType();
+            $tableName = $weather->getTable();
             $this->bar?->start(count($this->amiData->resultsWeather));
+
+            $weatherResults = [];
             foreach ($this->amiData->resultsWeather as $result) {
-                $weather = new $weatherType([
+                $weatherResults[] = [
                     'station'  => $this->inputParameters['WeatherStation'],
                     'ts'       => $result[0],
                     'uom'      => $this->inputParameters['WeatherDataUOM'],
                     'observed' => $result[1]
-                ]);
-                $weather->save();
+                ];
                 $this->bar?->advance();
                 $totalSaved++;
+            }
+
+            foreach (collect($weatherResults)->chunk(1000) as $chunk) {
+                DB::table($tableName)->insert($chunk->toArray());
             }
             $this->bar?->finish();
         }
