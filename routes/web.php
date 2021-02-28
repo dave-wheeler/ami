@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,6 @@ Route::get('/', function () {
 
 Route::get('/upload', [UploadController::class, 'index'])->name('upload.index');
 Route::post('/upload', [UploadController::class, 'store'])->name('upload.store');
+
+Route::get('/stats', [StatsController::class, 'index'])->name('stats.form');
+Route::post('/stats', [StatsController::class, 'show'])->name('stats.show');

@@ -84,7 +84,7 @@
 
                                     Analysis
                                     <ul>
-                                        <li>Coming soon</li>
+                                        <li><a href="{{route('stats.form')}}">Stats by date range</a></li>
                                     </ul>
                                 </div>
                             </div>
