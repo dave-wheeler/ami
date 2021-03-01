@@ -9,15 +9,17 @@
 
             @if (isset($stats))
                 @foreach($stats as $statName => $data)
-                    <h3>{{ $statName }}</h3>
-                    <ul>
-                        <li>Number of Items (n): {{ $data['n'] }}</li>
-                        <li>Min: {{ $data['min'] }}</li>
-                        <li>Max: {{ $data['max'] }}</li>
-                        <li>Mean: {{ $data['mean'] }}</li>
-                        <li>Median: {{ $data['median'] }}</li>
-                        <li>σ: {{ $data['sd'] }}</li>
-                    </ul>
+                    <details>
+                        <summary class="text-summary">{{ $statName }}</summary>
+                            <ul>
+                                <li>Number of Items (n): {{ $data['n'] }}</li>
+                                <li>Min: {{ $data['min'] }}</li>
+                                <li>Max: {{ $data['max'] }}</li>
+                                <li>Mean: {{ $data['mean'] }}</li>
+                                <li>Median: {{ $data['median'] }}</li>
+                                <li>σ: {{ $data['sd'] }}</li>
+                            </ul>
+                    </details>
                 @endforeach
             @elseif (isset($error))
                 <h3>Exception Occurred!</h3>

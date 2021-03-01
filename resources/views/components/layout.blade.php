@@ -120,6 +120,13 @@
                 font-size: 1.125rem
             }
 
+            .text-summary {
+                font-size: 1.17rem;
+                font-weight: bold;
+                margin-block-start: 0.5em;
+                margin-block-end: 0.5em
+            }
+
             .leading-7 {
                 line-height: 1.75rem
             }
