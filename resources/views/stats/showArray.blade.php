@@ -1,5 +1,5 @@
-<details {{ $toplevel ? '' : 'open=""' }}>
-    <summary {{ $toplevel ? 'class=text-summary' : '' }}>
+<details{!! $toplevel ? '' : ' open=""' !!}>
+    <summary{!! $toplevel ? ' class="text-summary"' : '' !!}>
         {{ $summary }}
     </summary>
     <ul>
