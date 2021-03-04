@@ -5,8 +5,9 @@
         @php
             echo Form::open(['route' => 'upload.store', 'files' => 'true']);
             echo 'Select the file to upload.<br/><br/>';
-            echo Form::file('data') . '<br/><br/>';
-            echo Form::submit('Upload File');
+            // TODO: Use a better uploader than native HTML control
+            echo Form::file('data', ['class' => 'dark:input']) . '<br/><br/>';
+            echo Form::submit('Upload File', ['class' => 'dark:input']);
             echo Form::close();
         @endphp
     </div>
