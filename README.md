@@ -4,5 +4,8 @@ AMI is a [Laravel](https://laravel.com/) app for importing and analyzing [Advanc
 ## Requirements
 AMI requires [**PHP 8.0+**](https://www.php.net/). The rest of the dependencies are handled by composer.
 
+## Sample Data
+Some sample data can be found @ [ami-data](https://github.com/dave-wheeler/ami-data)
+
 ## License
 AMI is open-sourced software licensed under the [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
