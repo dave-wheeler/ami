@@ -1,9 +1,8 @@
 <x-layout>
     <x-slot name="title">Statistics - Date Range Selection</x-slot>
 
-    <div class="ml-12">
-        <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
-            @php
+    <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+        @php
             echo Form::open(['route' => 'stats.show']);
             echo 'Select the date/time range.<br/>';
             // TODO: Use a better date/time selector than native HTML controls
@@ -17,7 +16,6 @@
             echo Form::time('endTime', $now->format('H:i')) . '<br/>';
             echo '<br/><br/>' . Form::submit();
             echo Form::close();
-            @endphp
-        </div>
+        @endphp
     </div>
 </x-layout>

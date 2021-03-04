@@ -36,12 +36,10 @@
 
             *, :after, :before {
                 box-sizing: border-box;
-                border: 0 solid #e2e8f0
             }
 
             a {
                 color: inherit;
-                text-decoration: inherit
             }
 
             svg, video {
@@ -418,7 +416,7 @@
 
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="grid grid-cols-1">
                         <div class="p-6">
                             {{ $slot }}
                         </div>
