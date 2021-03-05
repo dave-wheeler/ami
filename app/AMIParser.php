@@ -3,10 +3,10 @@
 
 namespace App;
 
-use App\Models\DailyPrecipitation;
-use App\Models\RelativeHumidity;
-use App\Models\Temperature;
-use App\Models\WindSpeed;
+use App\Models\Stats\DailyPrecipitation;
+use App\Models\Stats\RelativeHumidity;
+use App\Models\Stats\Temperature;
+use App\Models\Stats\WindSpeed;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use JetBrains\PhpStorm\ArrayShape;

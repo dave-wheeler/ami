@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Stats;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Temperature extends Model
+class MeterUsage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['station', 'ts', 'uom', 'observed'];
+    protected $fillable = ['meter', 'ts', 'uom', 'usage', 'peak'];
     public $timestamps = false;
 }

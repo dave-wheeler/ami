@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Stats;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DailyPrecipitation extends Model
+class Temperature extends Model
 {
     use HasFactory;
 

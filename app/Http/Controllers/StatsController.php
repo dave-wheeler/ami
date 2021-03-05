@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DailyPrecipitation;
-use App\Models\MeterUsage;
-use App\Models\RelativeHumidity;
-use App\Models\Temperature;
-use App\Models\WindSpeed;
+use App\Models\Stats\DailyPrecipitation;
+use App\Models\Stats\MeterUsage;
+use App\Models\Stats\RelativeHumidity;
+use App\Models\Stats\Temperature;
+use App\Models\Stats\WindSpeed;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use MathPHP\Exception\BadDataException;
