@@ -6,13 +6,20 @@
             <h2>{{ $startDateTime }} to {{ $endDateTime }}</h2>
         </div>
 
-        @if (isset($stats))
-            @foreach($stats as $statName => $data)
-                @include('stats.showArray', ['summary' => $statName, 'details' => $data, 'toplevel' => true])
-            @endforeach
-        @elseif (isset($error))
-            <h3>Exception Occurred!</h3>
-            {{ $error }}
-        @endif
+        <div>
+            @if (isset($errors))
+                @foreach($errors as $error)
+                    {{ $error }}<br/>
+                @endforeach
+            @endif
+        </div>
+
+        <div>
+            @if (isset($stats))
+                @foreach($stats as $statName => $data)
+                    @include('stats.showArray', ['summary' => $statName, 'details' => $data, 'toplevel' => true])
+                @endforeach
+            @endif
+        </div>
     </div>
 </x-layout>

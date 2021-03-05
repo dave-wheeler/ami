@@ -15,6 +15,14 @@ use MathPHP\Statistics\Descriptive;
 
 class StatsController extends Controller
 {
+    protected static array $classes = [
+        MeterUsage::class,
+        Temperature::class,
+        WindSpeed::class,
+        DailyPrecipitation::class,
+        RelativeHumidity::class
+    ];
+
     /**
      * Display a listing of the resource.
      *
@@ -36,34 +44,35 @@ class StatsController extends Controller
         $startDateTime = "{$request->input('startDate')} {$request->input('startTime')}";
         $endDateTime = "{$request->input('endDate')} {$request->input('endTime')}";
         $stats = [];
+        $errors = [];
 
-        $classes = [
-            MeterUsage::class,
-            Temperature::class,
-            WindSpeed::class,
-            DailyPrecipitation::class,
-            RelativeHumidity::class
-        ];
-        foreach ($classes as $className) {
+        foreach (self::$classes as $className) {
             $column = ($className == MeterUsage::class) ? 'usage' : 'observed';
+            $label = trim(preg_replace('/([A-Z])/', ' $1', class_basename($className)));
+
             $data = $className::whereBetween('ts', [$startDateTime, $endDateTime])
                 ->get($column)
                 ->pluck($column)->all();
+            if (empty($data)) {
+                $errors[] = "No data found for $label";
+                continue;
+            }
+
             $unitOfMeasurement = $className::whereBetween('ts', [$startDateTime, $endDateTime])
                 ->get('uom')
                 ->first()
                 ->uom;
+            $label .= " ($unitOfMeasurement)";
 
-            $label = trim(preg_replace('/([A-Z])/', ' $1', class_basename($className))) . " ($unitOfMeasurement)";
             try {
                 $stats[$label] = Descriptive::describe($data, true);
             } catch (BadDataException | OutOfBoundsException $e) {
-                $error = $e->getMessage();
-                return view('stats.show', compact('startDateTime', 'endDateTime', 'error'));
+                $errors[] = "Exception thrown for $label: " . $e->getMessage();
+                continue;
             }
         }
 
-        $results = compact('startDateTime', 'endDateTime', 'stats');
+        $results = compact('startDateTime', 'endDateTime', 'stats', 'errors');
         //dump($results);
         return view('stats.show', $results);
     }
