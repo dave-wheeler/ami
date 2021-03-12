@@ -7,9 +7,16 @@
         "irea"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/gregseth/suncalc-php.git"
+        }
+    ],
     "require": {
         "php": "^8.0",
         "ext-pdo": "*",
+        "auroras-live/suncalc-php": "dev-master",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",

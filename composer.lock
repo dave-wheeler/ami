@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3dafca44bdf7457c7da23ae67b7bb8ba",
+    "content-hash": "44f52ba0d9bb38284fc67bab11faa5cb",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -61,6 +61,33 @@
                 "source": "https://github.com/asm89/stack-cors/tree/v2.0.3"
             },
             "time": "2021-03-11T06:42:03+00:00"
+        },
+        {
+            "name": "auroras-live/suncalc-php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gregseth/suncalc-php.git",
+                "reference": "e88805e686dbd327609fba18a34075bcb76ac221"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "suncalc.php"
+                ]
+            },
+            "license": [
+                "GPLv2"
+            ],
+            "authors": [
+                {
+                    "name": "David Gray and Greg Seth",
+                    "email": "david@auroras.live"
+                }
+            ],
+            "description": "Sun and moon calculations for PHP",
+            "time": "2019-02-01T10:20:40+00:00"
         },
         {
             "name": "brick/math",
@@ -8711,7 +8738,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "auroras-live/suncalc-php": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
