@@ -20,8 +20,7 @@ class CreateMeterUsagesTable extends Migration
             $table->string('uom', 25);
             $table->double('usage');
             $table->boolean('peak');
-            // TODO: Deal with duplicate timestamps from clock back when going from daylight savings to standard and re-enable unique constraint
-            // $table->unique(['meter', 'ts']);
+            $table->unique(['meter', 'ts']);
         });
     }
 
