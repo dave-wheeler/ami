@@ -40,14 +40,25 @@ class AMIParser
         $meterUsages = [];
         foreach ($this->amiData->resultsInfo as $i => $resultInfo) {
             $peak = ($resultInfo->datasetTitle == "On-peak");
+            $previousTimestamp = null;
             foreach ($this->amiData->resultsTiered[0][$i] as $result) {
                 if ($result[1] != 0.0) {
                     if ($this->inputParameters['DatasetType'] != 'Weather') {
+                        // Create a timestamp, converted from app.timezone to UTC
+                        $timestamp = Carbon::createFromFormat('Y-m-d H:i', $result[0], config('app.timezone'))
+                            ->setTimezone('UTC');
+                        if ($timestamp == $previousTimestamp) {
+                            // I.R.E.A. duplicates timestamps when clocks get set back an hour for the end
+                            // of DST, i.e. one for daylight savings time, and a second for standard time.
+                            // If the previous timestamp and this one are exactly the same, then advance
+                            // the time by one hour, so this one becomes the standard time version.
+                            $timestamp->add('hour', 1);
+                        }
+                        $previousTimestamp = $timestamp;
+
                         $meterUsages[] = [
                             'meter' => $meterId,
-                            //'ts'    => $result[0],
-                            'ts'    => Carbon::createFromFormat('Y-m-d H:i', $result[0],
-                                config('app.timezone'))->setTimezone('UTC'),
+                            'ts'    => $timestamp,
                             'uom'   => $meterUOM,
                             'usage' => $result[1],
                             'peak'  => $peak
