@@ -7,6 +7,7 @@ use App\Models\Stats\MeterUsage;
 use App\Models\Stats\RelativeHumidity;
 use App\Models\Stats\Temperature;
 use App\Models\Stats\WindSpeed;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use MathPHP\Exception\BadDataException;
@@ -42,15 +43,20 @@ class StatsController extends Controller
     public function show(Request $request): View
     {
         $startDateTime = "{$request->input('startDate')} {$request->input('startTime')}";
+        $queryStart = Carbon::createFromFormat('Y-m-d H:i', $startDateTime, config('app.timezone'))
+            ->setTimezone('UTC');
+
         $endDateTime = "{$request->input('endDate')} {$request->input('endTime')}";
-        $stats = [];
-        $errors = [];
+        $queryEnd = Carbon::createFromFormat('Y-m-d H:i', $endDateTime, config('app.timezone'))
+            ->setTimezone('UTC');
+
+        $stats = $errors = [];
 
         foreach (self::$classes as $className) {
             $column = ($className == MeterUsage::class) ? 'usage' : 'observed';
             $label = trim(preg_replace('/([A-Z])/', ' $1', class_basename($className)));
 
-            $data = $className::whereBetween('ts', [$startDateTime, $endDateTime])
+            $data = $className::whereBetween('ts', [$queryStart, $queryEnd])
                 ->get($column)
                 ->pluck($column)->all();
             if (empty($data)) {
