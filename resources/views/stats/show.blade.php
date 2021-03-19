@@ -1,25 +1,25 @@
 <x-layout>
-    <x-slot name="title">Statistics By Date Range ({{ $startDateTime }} to {{ $endDateTime }})</x-slot>
+    <x-slot name="title">Statistics By Date Range ({{ $dates['start'] }} to {{ $dates['end'] }})</x-slot>
 
     <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
         <div class="text-center">
-            <h2>{{ $startDateTime }} to {{ $endDateTime }}</h2>
+            <h2>{{ $dates['start'] }} to {{ $dates['end'] }}</h2>
         </div>
 
-        <div>
-            @if (isset($errors))
+        @if (isset($errors))
+            <div>
                 @foreach($errors as $error)
                     {{ $error }}<br/>
                 @endforeach
-            @endif
-        </div>
+            </div>
+        @endif
 
-        <div>
-            @if (isset($stats))
+        @if (isset($stats))
+            <div>
                 @foreach($stats as $statName => $data)
                     @include('stats.showArray', ['summary' => $statName, 'details' => $data, 'toplevel' => true])
                 @endforeach
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
 </x-layout>

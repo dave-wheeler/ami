@@ -4,6 +4,7 @@
 namespace App;
 
 use App\Models\Stats\DailyPrecipitation;
+use App\Models\Stats\MeterUsage;
 use App\Models\Stats\RelativeHumidity;
 use App\Models\Stats\Temperature;
 use App\Models\Stats\WindSpeed;
@@ -74,7 +75,7 @@ class AMIParser
         }
 
         foreach (collect($meterUsages)->chunk(1000) as $chunk) {
-            DB::table('meter_usages')->insert($chunk->toArray());
+            MeterUsage::insert($chunk->toArray());
         }
         $this->bar?->finish();
 
