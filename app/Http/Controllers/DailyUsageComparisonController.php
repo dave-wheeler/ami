@@ -8,6 +8,7 @@ use App\Models\Stats\MeterUsage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use MathPHP\Exception\OutOfBoundsException;
+use MathPHP\Statistics\Descriptive;
 use MathPHP\Statistics\Significance;
 
 class DailyUsageComparisonController extends Controller
@@ -57,9 +58,17 @@ class DailyUsageComparisonController extends Controller
         } else {
             try {
                 $tTest = Significance::tTestTwoSample($data1, $data2);
-                $zTest = Significance::zTestTwoSample($tTest['mean1'], $tTest['mean2'],
-                    count($data1), count($data2),
-                    $tTest['sd1'], $tTest['sd2']);
+
+                $stats1 = Descriptive::describe($data1, true);
+                $stats2 = Descriptive::describe($data2, true);
+                $zTest = Significance::zTestTwoSample(
+                    $stats1['mean'],
+                    $stats2['mean'],
+                    count($data1),
+                    count($data2),
+                    $stats1['sd'],
+                    $stats2['sd']
+                );
             } catch (OutOfBoundsException $e) {
                 $errors[] = "Exception thrown for Student's t-test: " . $e->getMessage();
             }
