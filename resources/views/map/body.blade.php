@@ -7,6 +7,36 @@
     var map = L.map('map').fitWorld();
     var marker = null;
 
+    function updateHidden(latlng) {
+        $('input[name="lat"]').val(latlng.lat);
+        $('input[name="lon"]').val(latlng.lng);
+    }
+
+    map.on('locationfound', function (e) {
+        marker = L.marker(e.latlng);
+        marker.addTo(map);
+        updateHidden(e.latlng);
+    });
+
+    map.on('locationerror', function (e) {
+        map.flyTo({lat: 0, lon: 0}, 1);
+        marker = L.marker({lat: 0, lon: 0});
+        marker.addTo(map);
+    });
+
+    map.on('click', function (e) {
+        map.panTo(e.latlng, {animate: true, duration: .50});
+        marker.setLatLng(e.latlng);
+        updateHidden(e.latlng);
+    });
+
+    map.on('moveend', function (e) {
+        if (marker === null) return;
+        latlng = map.getCenter();
+        marker.setLatLng(latlng);
+        updateHidden(latlng);
+    });
+
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
@@ -16,27 +46,5 @@
         accessToken: '{{ config('services.mapbox.token') }}'
     }).addTo(map);
 
-    map.on('locationfound', function (e) {
-        marker = L.marker(e.latlng);
-        marker.addTo(map);
-        // console.log(map.getZoom());
-    });
-
-    map.on('locationerror', function (e) {
-        map.flyTo({lat: 0, lon: 0}, 1);
-        marker = L.marker({lat: 0, lon: 0});
-        marker.addTo(map);
-    });
-
     map.locate({setView: true, maxZoom: 16});
-
-    map.on('click', function (e) {
-        map.panTo(e.latlng, {animate: true, duration: .50});
-        marker.setLatLng(e.latlng);
-    });
-
-    map.on('moveend', function (e) {
-        if (marker === null) return;
-        marker.setLatLng(map.getCenter());
-    });
 </script>
