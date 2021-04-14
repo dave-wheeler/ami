@@ -39,7 +39,7 @@ class ImportAMI extends Command
      * @param AMIParser $parser
      * @return int
      */
-    public function handle(AMIParser $parser)
+    public function handle(AMIParser $parser): int
     {
         $path = $this->argument('file');
         if (!is_readable($path)) {
