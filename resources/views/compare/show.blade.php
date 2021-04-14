@@ -5,8 +5,10 @@
         <div class="text-center">
             <h1>Daily Usage Comparison</h1>
             <h2>{{ $dates['start1'] }} to {{ $dates['end1'] }}</h2>
+            <p>Mean daylight: {{ $daylightMean1 }} seconds</p>
             <h4>Compared To</h4>
             <h2>{{ $dates['start2'] }} to {{ $dates['end2'] }}</h2>
+            <p>Mean daylight: {{ $daylightMean2 }} seconds</p>
         </div>
 
         @if (isset($errors))

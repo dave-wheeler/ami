@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Stats\MeterUsage;
-//use AurorasLive\SunCalc;
-//use DateTime;
+use AurorasLive\SunCalc;
+use DateTime;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use MathPHP\Exception\OutOfBoundsException;
@@ -23,6 +23,43 @@ class DailyUsageComparisonController extends Controller
         return view('compare.form');
     }
 
+    private function getDaylightSeconds(DateTime $date, string $lat, string $lon): int
+    {
+        $times = (new SunCalc($date, $lat, $lon))->getSunTimes();
+
+        $daylight = $times['sunrise']->diff($times['sunset']);
+
+        return $daylight->h * 3600 + $daylight->i * 60 + $daylight->s;
+    }
+
+    private function getAllDaylightSeconds(array $dates, string $lat, string $lon): array
+    {
+        /*
+         * Set times to noon to make absolutely sure DST changes
+         * don't result in misinterpretations that break things
+         * */
+        $result = [
+            'daylight1' => [],
+            'daylight2' => []
+        ];
+
+        $start1 = new DateTime($dates['start1'] . 'T12:00:00');
+        $end1 = new DateTime($dates['end1'] . 'T12:00:00');
+        while ($start1 <= $end1) {
+            $result['daylight1'][] = $this->getDaylightSeconds($start1, $lat, $lon);
+            $start1->modify('+1 day');
+        }
+
+        $start2 = new DateTime($dates['start2'] . 'T12:00:00');
+        $end2 = new DateTime($dates['end2'] . 'T12:00:00');
+        while ($start2 <= $end2) {
+            $result['daylight2'][] = $this->getDaylightSeconds($start2, $lat, $lon);
+            $start2->modify('+1 day');
+        }
+
+        return $result;
+    }
+
     /**
      * Display the specified resource.
      *
@@ -34,16 +71,9 @@ class DailyUsageComparisonController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $tTest = $zTest = $errors = [];
 
-        /*
-        $lat = $request->input('lat');
-        $lon = $request->input('lon');
-
-        $times = (new SunCalc(new DateTime(), $request->input('lat'), $request->input('lon')))
-            ->getSunTimes();
-        $daylight = $times['sunrise']->diff($times['sunset']);
-        $seconds['day'] = $daylight->h * 3600 + $daylight->i * 60 + $daylight->s;
-        $seconds['night'] = 86400 - $seconds['day'];
-        */
+        $daylightSeconds = $this->getAllDaylightSeconds($dates, $request->input('lat'), $request->input('lon'));
+        $daylightMean1 = Descriptive::describe($daylightSeconds['daylight1'], true)['mean'];
+        $daylightMean2 = Descriptive::describe($daylightSeconds['daylight2'], true)['mean'];
 
         $data1 = $this->getDailyUsage($dates['start1'], $dates['end1']);
         $data2 = $this->getDailyUsage($dates['start2'], $dates['end2']);
@@ -74,7 +104,7 @@ class DailyUsageComparisonController extends Controller
             }
         }
 
-        return view('compare.show', compact('dates', 'tTest', 'zTest', 'errors'));
+        return view('compare.show', compact('dates', 'daylightMean1', 'daylightMean2', 'tTest', 'zTest', 'errors'));
     }
 
     protected function getDailyUsage(string $startDate, string $endDate): array
