@@ -1,4 +1,3 @@
-@include('map.head')
 <x-layout>
     <x-slot name="title">Compare Daily Usage by Date Ranges</x-slot>
 
