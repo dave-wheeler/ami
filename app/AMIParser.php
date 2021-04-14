@@ -10,7 +10,6 @@ use App\Models\Stats\Temperature;
 use App\Models\Stats\WindSpeed;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use JetBrains\PhpStorm\ArrayShape;
 use StdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -20,7 +19,6 @@ class AMIParser
     private array $inputParameters;
     private ?ProgressBar $bar;
 
-    #[ArrayShape(['type' => "string", 'parsed' => "int", 'saved' => "int", 'discrepancies' => "array"])]
     private function parseMeterUsage(): array
     {
         $meterId = $this->amiData->meterId;
@@ -91,7 +89,6 @@ class AMIParser
         ];
     }
 
-    #[ArrayShape(['type' => "mixed", 'parsed' => "int", 'saved' => "int"])]
     private function parseWeatherData(): array
     {
         $weatherType = match ($this->inputParameters['WeatherDataType']) {
