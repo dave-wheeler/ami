@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Stats\MeterUsage;
 use AurorasLive\SunCalc;
 use DateTime;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use MathPHP\Exception\OutOfBoundsException;
+use MathPHP\Exception\BadDataException;
+use MathPHP\Exception\MathException;
+use MathPHP\Statistics\Average;
 use MathPHP\Statistics\Descriptive;
 use MathPHP\Statistics\Significance;
 
@@ -34,28 +37,34 @@ class DailyUsageComparisonController extends Controller
 
     private function getAllDaylightSeconds(array $dates, string $lat, string $lon): array
     {
-        /*
-         * Set times to noon to make absolutely sure DST changes
-         * don't result in misinterpretations that break things
-         * */
         $result = [
             'daylight1' => [],
             'daylight2' => []
         ];
 
-        $start1 = new DateTime($dates['start1'] . 'T12:00:00');
-        $end1 = new DateTime($dates['end1'] . 'T12:00:00');
-        while ($start1 <= $end1) {
-            $result['daylight1'][] = $this->getDaylightSeconds($start1, $lat, $lon);
-            $start1->modify('+1 day');
-        }
+        /*
+         * Set times to noon to make absolutely sure DST changes
+         * don't result in misinterpretations that break things
+         * */
+        try {
+            $start1 = new DateTime($dates['start1'] . 'T12:00:00');
+            $end1 = new DateTime($dates['end1'] . 'T12:00:00');
 
-        $start2 = new DateTime($dates['start2'] . 'T12:00:00');
-        $end2 = new DateTime($dates['end2'] . 'T12:00:00');
-        while ($start2 <= $end2) {
-            $result['daylight2'][] = $this->getDaylightSeconds($start2, $lat, $lon);
-            $start2->modify('+1 day');
-        }
+            while ($start1 <= $end1) {
+                $result['daylight1'][] = $this->getDaylightSeconds($start1, $lat, $lon);
+                $start1->modify('+1 day');
+            }
+        } catch (Exception) {}
+
+        try {
+            $start2 = new DateTime($dates['start2'] . 'T12:00:00');
+            $end2 = new DateTime($dates['end2'] . 'T12:00:00');
+
+            while ($start2 <= $end2) {
+                $result['daylight2'][] = $this->getDaylightSeconds($start2, $lat, $lon);
+                $start2->modify('+1 day');
+            }
+        } catch (Exception) {}
 
         return $result;
     }
@@ -72,8 +81,14 @@ class DailyUsageComparisonController extends Controller
         $tTest = $zTest = $errors = [];
 
         $daylightSeconds = $this->getAllDaylightSeconds($dates, $request->input('lat'), $request->input('lon'));
-        $daylightMean1 = Descriptive::describe($daylightSeconds['daylight1'], true)['mean'];
-        $daylightMean2 = Descriptive::describe($daylightSeconds['daylight2'], true)['mean'];
+        try {
+            $daylightMean1 = Average::mean($daylightSeconds['daylight1']);
+            $daylightMean2 = Average::mean($daylightSeconds['daylight2']);
+        } catch (BadDataException $e) {
+            $daylightMean1 = "?";
+            $daylightMean2 = "?";
+            $errors[] = "Exception thrown for median daylight: " . $e->getMessage();
+        }
 
         $data1 = $this->getDailyUsage($dates['start1'], $dates['end1']);
         $data2 = $this->getDailyUsage($dates['start2'], $dates['end2']);
@@ -89,17 +104,15 @@ class DailyUsageComparisonController extends Controller
             try {
                 $tTest = Significance::tTestTwoSample($data1, $data2);
 
-                $stats1 = Descriptive::describe($data1, true);
-                $stats2 = Descriptive::describe($data2, true);
                 $zTest = Significance::zTestTwoSample(
-                    $stats1['mean'],
-                    $stats2['mean'],
+                    Average::mean($data1),
+                    Average::mean($data2),
                     count($data1),
                     count($data2),
-                    $stats1['sd'],
-                    $stats2['sd']
+                    Descriptive::standardDeviation($data1, true),
+                    Descriptive::standardDeviation($data2, true)
                 );
-            } catch (OutOfBoundsException $e) {
+            } catch (MathException $e) {
                 $errors[] = "Exception thrown for Student's t-test: " . $e->getMessage();
             }
         }
