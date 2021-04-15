@@ -46,7 +46,8 @@ class StatsController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $stats = $errors = [];
 
-        $daylightSeconds = $this->getDaylightAmountsForDateRange($dates['start'], $dates['end'], $request->input('lat'), $request->input('lon'));
+        $daylightSeconds = $this->getDaylightAmountsForDateRange($dates['start'], $dates['end'],
+            $request->input('lat'), $request->input('lon'));
         try {
             $daylightMean = $this->formattedStringFromSeconds(Average::mean($daylightSeconds));
         } catch (BadDataException $e) {
