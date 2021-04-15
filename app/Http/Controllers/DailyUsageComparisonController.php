@@ -34,13 +34,17 @@ class DailyUsageComparisonController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $tTest = $zTest = $errors = [];
 
-        $daylightSeconds = $this->getAllDaylightAmounts($dates, $request->input('lat'), $request->input('lon'));
-
+        $daylightSeconds1 = $this->getDaylightAmountsForDateRange($dates['start1'], $dates['end1'],$request->input('lat'), $request->input('lon'));
+        $daylightSeconds2 = $this->getDaylightAmountsForDateRange($dates['start2'], $dates['end2'],$request->input('lat'), $request->input('lon'));
         try {
-            $daylightMean1 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds['daylight1']));
-            $daylightMean2 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds['daylight2']));
+            $daylightMean1 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds1));
         } catch (BadDataException $e) {
             $daylightMean1 = "?";
+            $errors[] = "Exception thrown for median daylight: " . $e->getMessage();
+        }
+        try {
+            $daylightMean2 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds2));
+        } catch (BadDataException $e) {
             $daylightMean2 = "?";
             $errors[] = "Exception thrown for median daylight: " . $e->getMessage();
         }

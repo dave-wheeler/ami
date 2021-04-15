@@ -75,35 +75,16 @@ class Controller extends BaseController
         return $daylight->h * 3600 + $daylight->i * 60 + $daylight->s;
     }
 
-    protected function getAllDaylightAmounts(array $dates, string $lat, string $lon): array
+    protected function getDaylightAmountsForDateRange(string $startDate, string $endDate, string $lat, string $lon): array
     {
-        $result = [
-            'daylight1' => [],
-            'daylight2' => []
-        ];
-
-        /*
-         * Set times to noon to make absolutely sure DST changes
-         * don't result in misinterpretations that break things
-         * */
+        $result = [];
         try {
-            $start1 = new DateTime($dates['start1'] . 'T12:00:00');
-            $end1 = new DateTime($dates['end1'] . 'T12:00:00');
+            $start = new DateTime($startDate . 'T12:00:00');
+            $end = new DateTime($endDate . 'T12:00:00');
 
-            while ($start1 <= $end1) {
-                $result['daylight1'][] = $this->getDaylightAmount($start1, $lat, $lon);
-                $start1->modify('+1 day');
-            }
-        } catch (Exception) {
-        }
-
-        try {
-            $start2 = new DateTime($dates['start2'] . 'T12:00:00');
-            $end2 = new DateTime($dates['end2'] . 'T12:00:00');
-
-            while ($start2 <= $end2) {
-                $result['daylight2'][] = $this->getDaylightAmount($start2, $lat, $lon);
-                $start2->modify('+1 day');
+            while ($start <= $end) {
+                $result[] = $this->getDaylightAmount($start, $lat, $lon);
+                $start->modify('+1 day');
             }
         } catch (Exception) {
         }
