@@ -26,7 +26,7 @@ class DailyUsageComparisonController extends Controller
         return view('compare.form');
     }
 
-    private function getDaylightSeconds(DateTime $date, string $lat, string $lon): int
+    private function getDaylightAmount(DateTime $date, string $lat, string $lon): int
     {
         $times = (new SunCalc($date, $lat, $lon))->getSunTimes();
 
@@ -35,7 +35,7 @@ class DailyUsageComparisonController extends Controller
         return $daylight->h * 3600 + $daylight->i * 60 + $daylight->s;
     }
 
-    private function getAllDaylightSeconds(array $dates, string $lat, string $lon): array
+    private function getAllDaylightAmounts(array $dates, string $lat, string $lon): array
     {
         $result = [
             'daylight1' => [],
@@ -51,7 +51,7 @@ class DailyUsageComparisonController extends Controller
             $end1 = new DateTime($dates['end1'] . 'T12:00:00');
 
             while ($start1 <= $end1) {
-                $result['daylight1'][] = $this->getDaylightSeconds($start1, $lat, $lon);
+                $result['daylight1'][] = $this->getDaylightAmount($start1, $lat, $lon);
                 $start1->modify('+1 day');
             }
         } catch (Exception) {}
@@ -61,7 +61,7 @@ class DailyUsageComparisonController extends Controller
             $end2 = new DateTime($dates['end2'] . 'T12:00:00');
 
             while ($start2 <= $end2) {
-                $result['daylight2'][] = $this->getDaylightSeconds($start2, $lat, $lon);
+                $result['daylight2'][] = $this->getDaylightAmount($start2, $lat, $lon);
                 $start2->modify('+1 day');
             }
         } catch (Exception) {}
@@ -80,7 +80,8 @@ class DailyUsageComparisonController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $tTest = $zTest = $errors = [];
 
-        $daylightSeconds = $this->getAllDaylightSeconds($dates, $request->input('lat'), $request->input('lon'));
+        $daylightSeconds = $this->getAllDaylightAmounts($dates, $request->input('lat'), $request->input('lon'));
+
         try {
             $daylightMean1 = Average::mean($daylightSeconds['daylight1']);
             $daylightMean2 = Average::mean($daylightSeconds['daylight2']);
