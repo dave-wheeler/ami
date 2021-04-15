@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use MathPHP\Exception\BadDataException;
 use MathPHP\Exception\OutOfBoundsException;
+use MathPHP\Statistics\Average;
 use MathPHP\Statistics\Descriptive;
 
 class StatsController extends Controller
@@ -42,7 +43,16 @@ class StatsController extends Controller
     public function show(Request $request): View
     {
         $dateTimes = $this->extractDateTimesFromForm($request);
+        $dates = $this->extractDatesFromForm($request);
         $stats = $errors = [];
+
+        $daylightSeconds = $this->getDaylightAmountsForDateRange($dates['start'], $dates['end'], $request->input('lat'), $request->input('lon'));
+        try {
+            $daylightMean = $this->formattedStringFromSeconds(Average::mean($daylightSeconds));
+        } catch (BadDataException $e) {
+            $daylightMean = "?";
+            $errors[] = "Exception thrown for median daylight: " . $e->getMessage();
+        }
 
         foreach (self::$classes as $className) {
             $column = ($className == MeterUsage::class) ? 'usage' : 'observed';
@@ -70,7 +80,7 @@ class StatsController extends Controller
             }
         }
 
-        $results = compact('dateTimes', 'stats', 'errors');
+        $results = compact('dateTimes', 'daylightMean', 'stats', 'errors');
         //dump($results);
         return view('stats.show', $results);
     }

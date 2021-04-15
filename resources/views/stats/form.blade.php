@@ -1,9 +1,15 @@
 <x-layout>
     <x-slot name="title">Statistics - Date Range Selection</x-slot>
 
+    @include('map.body')
+
     <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
         @php
             echo Form::open(['route' => 'stats.show']);
+
+            echo Form::hidden('lat', 0);
+            echo Form::hidden('lon', 0);
+
             echo 'Select the date/time range.<br/>';
             // TODO: Use a better date/time selector than native HTML controls
             $now = now();
