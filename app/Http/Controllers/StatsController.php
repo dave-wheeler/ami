@@ -41,14 +41,14 @@ class StatsController extends Controller
      */
     public function show(Request $request): View
     {
-        $dates = $this->extractDateTimesFromForm($request);
+        $dateTimes = $this->extractDateTimesFromForm($request);
         $stats = $errors = [];
 
         foreach (self::$classes as $className) {
             $column = ($className == MeterUsage::class) ? 'usage' : 'observed';
             $label = trim(preg_replace('/([A-Z])/', ' $1', class_basename($className)));
 
-            $data = $className::whereBetween('ts', [$dates['queryStart'], $dates['queryEnd']])
+            $data = $className::whereBetween('ts', [$dateTimes['queryStart'], $dateTimes['queryEnd']])
                 ->get($column)
                 ->pluck($column)->all();
             if (empty($data)) {
@@ -56,7 +56,7 @@ class StatsController extends Controller
                 continue;
             }
 
-            $unitOfMeasurement = $className::whereBetween('ts', [$dates['queryStart'], $dates['queryEnd']])
+            $unitOfMeasurement = $className::whereBetween('ts', [$dateTimes['queryStart'], $dateTimes['queryEnd']])
                 ->get('uom')
                 ->first()
                 ->uom;
@@ -70,7 +70,7 @@ class StatsController extends Controller
             }
         }
 
-        $results = compact('dates', 'stats', 'errors');
+        $results = compact('dateTimes', 'stats', 'errors');
         //dump($results);
         return view('stats.show', $results);
     }

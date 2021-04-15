@@ -1,9 +1,9 @@
 <x-layout>
-    <x-slot name="title">Statistics By Date Range ({{ $dates['start'] }} to {{ $dates['end'] }})</x-slot>
+    <x-slot name="title">Statistics By Date Range ({{ $dateTimes['start'] }} to {{ $dateTimes['end'] }})</x-slot>
 
     <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
         <div class="text-center">
-            <h2>{{ $dates['start'] }} to {{ $dates['end'] }}</h2>
+            <h2>{{ $dateTimes['start'] }} to {{ $dateTimes['end'] }}</h2>
         </div>
 
         @if (isset($errors))
