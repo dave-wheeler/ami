@@ -1,4 +1,0 @@
-./database/migrations/2021_02_13_184813_create_meter_usages_table.php:            // TODO: Deal with duplicate timestamps from clock back when going from daylight savings to standard and re-enable unique constraint
-./resources/views/stats/form.blade.php:            // TODO: Use a better date/time selector than native HTML controls
-./resources/views/components/layout.blade.php:        <title>{{ $title ?? '*** TODO ADD TITLE! ***' }}</title>
-./resources/views/upload/form.blade.php:            // TODO: Use a better uploader than native HTML control
