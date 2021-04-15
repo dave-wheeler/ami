@@ -71,6 +71,16 @@ class DailyUsageComparisonController extends Controller
         return $result;
     }
 
+    private function formattedStringFromSeconds(float $seconds): string
+    {
+        $hours = (int)($seconds / 3600);
+        $seconds -= 3600 * $hours;
+        $minutes = (int)($seconds / 60);
+        $seconds -= 60 * $minutes;
+        $seconds = round($seconds);
+        return "${hours}h ${minutes}m ${seconds}s";
+    }
+
     /**
      * Display the specified resource.
      *
@@ -85,8 +95,8 @@ class DailyUsageComparisonController extends Controller
         $daylightSeconds = $this->getAllDaylightAmounts($dates, $request->input('lat'), $request->input('lon'));
 
         try {
-            $daylightMean1 = Average::mean($daylightSeconds['daylight1']);
-            $daylightMean2 = Average::mean($daylightSeconds['daylight2']);
+            $daylightMean1 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds['daylight1']));
+            $daylightMean2 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds['daylight2']));
         } catch (BadDataException $e) {
             $daylightMean1 = "?";
             $daylightMean2 = "?";
