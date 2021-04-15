@@ -54,7 +54,8 @@ class DailyUsageComparisonController extends Controller
                 $result['daylight1'][] = $this->getDaylightAmount($start1, $lat, $lon);
                 $start1->modify('+1 day');
             }
-        } catch (Exception) {}
+        } catch (Exception) {
+        }
 
         try {
             $start2 = new DateTime($dates['start2'] . 'T12:00:00');
@@ -64,7 +65,8 @@ class DailyUsageComparisonController extends Controller
                 $result['daylight2'][] = $this->getDaylightAmount($start2, $lat, $lon);
                 $start2->modify('+1 day');
             }
-        } catch (Exception) {}
+        } catch (Exception) {
+        }
 
         return $result;
     }
