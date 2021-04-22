@@ -19,6 +19,11 @@ class AMIParser
     private array $inputParameters;
     private ?ProgressBar $bar;
 
+    public function __construct()
+    {
+        ini_set('memory_limit', '1G');
+    }
+
     private function parseMeterUsage(): array
     {
         $meterId = $this->amiData->meterId;
