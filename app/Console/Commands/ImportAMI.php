@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\AMIParser;
 use Illuminate\Console\Command;
+use JsonException;
 use Symfony\Component\Mime\MimeTypes;
 
 class ImportAMI extends Command
@@ -46,8 +47,11 @@ class ImportAMI extends Command
             $this->error("$path does not exist, or is not readable!");
             return -1;
         }
-        if (MimeTypes::getDefault()->guessMimeType($path) != 'application/json') {
-            $this->error("$path is an invalid file type (application/json expected)!");
+
+        // NOTE: Mime guessers see JSON files as text if the size is over 2^20+1 bytes!
+        $mimeType = MimeTypes::getDefault()->guessMimeType($path);
+        if ($mimeType != 'application/json' && $mimeType != 'text/plain') {
+            $this->error("$path is an invalid mime type (application/json or text/plain is expected)!");
             return -1;
         }
         if (($fileContent = file_get_contents($path)) === false) {
@@ -55,7 +59,12 @@ class ImportAMI extends Command
             return -1;
         }
 
-        $result = $parser->parseFile($fileContent, $this->output->createProgressBar());
+        try {
+            $result = $parser->parseFile($fileContent, $this->output->createProgressBar());
+        } catch (JsonException) {
+            $this->error("$path does not contain well-formed JSON!");
+            return -1;
+        }
         $summary  = "\nType: $result[type]\n";
         $summary .= "Records Parsed: $result[parsed]\n";
         $summary .= "Records Saved: $result[saved]";

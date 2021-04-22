@@ -6,6 +6,7 @@ use App\AMIParser;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use JsonException;
 
 class UploadController extends Controller
 {
@@ -35,17 +36,27 @@ class UploadController extends Controller
         if (!$uploadedFile?->isValid()) {
             abort(400, $uploadedFile->getErrorMessage());
         }
-        if ($uploadedFile->getMimeType() != 'application/json') {
+
+        // NOTE: Mime guessers see JSON files as text if the size is over 2^20+1 bytes!
+        $uploadedFileType = $uploadedFile->getMimeType();
+        if ($uploadedFileType != 'application/json' && $uploadedFileType != 'text/plain') {
             abort(400, "Invalid file type was uploaded.");
         }
 
         try {
             $fileContent = $uploadedFile->get();
+            if ($fileContent === false) {
+                abort(500, "Failed to read contents of uploaded file");
+            }
         } catch (FileNotFoundException $e) {
             abort(500, $e->getMessage());
         }
 
-        $result = $parser->parseFile($fileContent, null);
+        try {
+            $result = $parser->parseFile($fileContent, null);
+        } catch (JsonException) {
+            abort(400, $uploadedFile->getClientOriginalName(). " does not contain well-formed JSON!");
+        }
         return view('upload.result', $result);
     }
 }

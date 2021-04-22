@@ -10,6 +10,7 @@ use App\Models\Stats\Temperature;
 use App\Models\Stats\WindSpeed;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use JsonException;
 use StdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 
@@ -141,10 +142,11 @@ class AMIParser
      * @param string $fileContent
      * @param ProgressBar|null $output
      * @return array
+     * @throws JsonException
      */
     public function parseFile(string $fileContent, ?ProgressBar $output): array
     {
-        $this->amiData = json_decode($fileContent);
+        $this->amiData = json_decode($fileContent, false, 512, JSON_THROW_ON_ERROR);
 
         $this->inputParameters = [];
         foreach ($this->amiData->inputParameters as $inputParameter) {
