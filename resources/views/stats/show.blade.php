@@ -4,6 +4,7 @@
     <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
         <div class="text-center">
             <h2>{{ $dateTimes['start'] }} to {{ $dateTimes['end'] }}</h2>
+            <p>Lat: {{$lat}}°&nbsp;Lon: {{$lon}}°</p>
             <p>Mean daylight each day: {{ $daylightMean }}</p>
         </div>
 

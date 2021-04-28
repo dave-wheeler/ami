@@ -4,6 +4,7 @@
     <div class="mt-2 text-lg text-gray-600 dark:text-gray-400">
         <div class="text-center">
             <h1>Daily Usage Comparison</h1>
+            <p>Lat: {{$lat}}°&nbsp;Lon: {{$lon}}°</p>
             <h2>{{ $dates['start1'] }} to {{ $dates['end1'] }}</h2>
             <p>Mean daylight each day: {{ $daylightMean1 }}</p>
             <h4>Compared To</h4>

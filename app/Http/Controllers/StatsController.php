@@ -47,8 +47,9 @@ class StatsController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $stats = $errors = [];
 
-        $daylightSeconds = $this->getDaylightAmountsForDateRange($dates['start'], $dates['end'],
-            $request->input('lat'), $request->input('lon'));
+        $lat = $request->input('lat');
+        $lon = $request->input('lon');
+        $daylightSeconds = $this->getDaylightAmountsForDateRange($dates['start'], $dates['end'], $lat, $lon);
         try {
             $daylightMean = $this->formattedStringFromSeconds(Average::mean($daylightSeconds));
         } catch (BadDataException $e) {
@@ -82,7 +83,7 @@ class StatsController extends Controller
             }
         }
 
-        $result = compact('dateTimes', 'daylightMean', 'stats', 'errors');
+        $result = compact('dateTimes', 'lat', 'lon', 'daylightMean', 'stats', 'errors');
         //dump($result);
         if ($request->isJson() || $request->wantsJson()) {
             return response()->json($result);

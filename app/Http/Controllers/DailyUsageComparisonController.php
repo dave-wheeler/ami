@@ -35,10 +35,10 @@ class DailyUsageComparisonController extends Controller
         $dates = $this->extractDatesFromForm($request);
         $tTest = $zTest = $errors = [];
 
-        $daylightSeconds1 = $this->getDaylightAmountsForDateRange($dates['start1'], $dates['end1'],
-            $request->input('lat'), $request->input('lon'));
-        $daylightSeconds2 = $this->getDaylightAmountsForDateRange($dates['start2'], $dates['end2'],
-            $request->input('lat'), $request->input('lon'));
+        $lat = $request->input('lat');
+        $lon = $request->input('lon');
+        $daylightSeconds1 = $this->getDaylightAmountsForDateRange($dates['start1'], $dates['end1'], $lat, $lon);
+        $daylightSeconds2 = $this->getDaylightAmountsForDateRange($dates['start2'], $dates['end2'], $lat, $lon);
         try {
             $daylightMean1 = $this->formattedStringFromSeconds(Average::mean($daylightSeconds1));
         } catch (BadDataException $e) {
@@ -79,7 +79,7 @@ class DailyUsageComparisonController extends Controller
             }
         }
 
-        $result = compact('dates', 'daylightMean1', 'daylightMean2', 'tTest', 'zTest', 'errors');
+        $result = compact('dates', 'lat', 'lon', 'daylightMean1', 'daylightMean2', 'tTest', 'zTest', 'errors');
         //dump($result);
         if ($request->isJson() || $request->wantsJson()) {
             return response()->json($result);
