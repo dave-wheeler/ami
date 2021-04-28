@@ -66,7 +66,7 @@ class Controller extends BaseController
         return $dates;
     }
 
-    protected function getDaylightAmount(DateTime $date, string $lat, string $lon): int
+    protected function getDaylightAmount(DateTime $date, float|string $lat, float|string $lon): int
     {
         $times = (new SunCalc($date, $lat, $lon))->getSunTimes();
 
@@ -75,7 +75,7 @@ class Controller extends BaseController
         return $daylight->h * 3600 + $daylight->i * 60 + $daylight->s;
     }
 
-    protected function getDaylightAmountsForDateRange(string $startDate, string $endDate, string $lat, string $lon): array
+    protected function getDaylightAmountsForDateRange(string $startDate, string $endDate, float|string $lat, float|string $lon): array
     {
         $result = [];
         try {

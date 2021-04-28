@@ -8,6 +8,7 @@ use App\Models\Stats\RelativeHumidity;
 use App\Models\Stats\Temperature;
 use App\Models\Stats\WindSpeed;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use MathPHP\Exception\BadDataException;
 use MathPHP\Exception\OutOfBoundsException;
@@ -38,9 +39,9 @@ class StatsController extends Controller
      * Display the specified resource.
      *
      * @param Request $request
-     * @return View
+     * @return JsonResponse|View
      */
-    public function show(Request $request): View
+    public function show(Request $request): JsonResponse|View
     {
         $dateTimes = $this->extractDateTimesFromForm($request);
         $dates = $this->extractDatesFromForm($request);
@@ -81,8 +82,12 @@ class StatsController extends Controller
             }
         }
 
-        $results = compact('dateTimes', 'daylightMean', 'stats', 'errors');
-        //dump($results);
-        return view('stats.show', $results);
+        $result = compact('dateTimes', 'daylightMean', 'stats', 'errors');
+        //dump($result);
+        if ($request->isJson() || $request->wantsJson()) {
+            return response()->json($result);
+        } else {
+            return view('stats.show', $result);
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Stats\MeterUsage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use MathPHP\Exception\BadDataException;
 use MathPHP\Exception\MathException;
@@ -27,9 +28,9 @@ class DailyUsageComparisonController extends Controller
      * Display the specified resource.
      *
      * @param Request $request
-     * @return View
+     * @return JsonResponse|View
      */
-    public function show(Request $request): View
+    public function show(Request $request): JsonResponse|View
     {
         $dates = $this->extractDatesFromForm($request);
         $tTest = $zTest = $errors = [];
@@ -78,7 +79,13 @@ class DailyUsageComparisonController extends Controller
             }
         }
 
-        return view('compare.show', compact('dates', 'daylightMean1', 'daylightMean2', 'tTest', 'zTest', 'errors'));
+        $result = compact('dates', 'daylightMean1', 'daylightMean2', 'tTest', 'zTest', 'errors');
+        //dump($result);
+        if ($request->isJson() || $request->wantsJson()) {
+            return response()->json($result);
+        } else {
+            return view('compare.show', $result);
+        }
     }
 
     protected function getDailyUsage(string $startDate, string $endDate): array
