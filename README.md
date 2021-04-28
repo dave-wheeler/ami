@@ -9,20 +9,20 @@ AMI is a [Laravel](https://laravel.com/) app for importing and analyzing [Advanc
 * Update app.timezone (in config/app.php). This should be set to 'America/Denver' for IREA users.
 
 ### Dev
-<code>composer i
+<code>composer i</code>
 
-npm i
+<code>npm i</code>
 
-npm run dev</code>
+<code>npm run dev</code>
 
 ### Prod
-<code>composer i --no-dev
+<code>composer i --no-dev</code>
 
-npm i
+<code>npm i</code>
 
-npm run prod
+<code>npm run prod</code>
 
-npm i --production</code>
+<code>npm i --production</code>
 
 ## Requirements
 AMI requires [**PHP 8.0+**](https://www.php.net/). The rest of the dependencies are handled by composer.
