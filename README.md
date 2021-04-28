@@ -7,6 +7,7 @@ AMI is a [Laravel](https://laravel.com/) app for importing and analyzing [Advanc
 * Copy .env.example => .env and update .env with local settings
 * In .env, set MAPBOX_ACCESS_TOKEN to your mapbox access token. This token should have all public scopes, MAP:READ, and TILESETS:READ
 * Update app.timezone (in config/app.php). This should be set to 'America/Denver' for IREA users.
+* Run migrations
 
 ### Dev
 <code>composer i</code>
