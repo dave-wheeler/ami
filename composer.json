@@ -23,7 +23,7 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "laravelcollective/html": "^6.2",
-        "markrogoyski/math-php": "^1.10"
+        "markrogoyski/math-php": "^2.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.9",
